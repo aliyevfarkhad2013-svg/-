@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Печать и подпись — конструктор договоров</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#16352f; --desk2:#0f2622; --paper:#fbf9f3; --ink:#1b2559; --text:#e8efe9; --mute:#9db5ac;
+  --seal:#b3302a; --gold:#d9b66a; --line:#d8d2c2; --panel:rgba(255,255,255,.06);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){--desk:#dfe7df;--desk2:#cbd8cf;--text:#17302a;--mute:#4c6860;--panel:rgba(255,255,255,.55)}
+}
+:root[data-theme="light"]{--desk:#dfe7df;--desk2:#cbd8cf;--text:#17302a;--mute:#4c6860;--panel:rgba(255,255,255,.55)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Manrope,system-ui,sans-serif;color:var(--text);background:radial-gradient(1200px 700px at 70% -10%,var(--desk),var(--desk2));min-height:100vh;overflow-x:hidden}
+header{max-width:1200px;margin:0 auto;padding:44px 24px 12px}
+h1{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:clamp(38px,7vw,76px);line-height:1;margin:0;letter-spacing:-.02em}
+.pen{display:block;width:min(420px,70%);height:24px;margin-top:6px;overflow:visible}
+.pen path{fill:none;stroke:var(--gold);stroke-width:3;stroke-linecap:round;stroke-dasharray:520;stroke-dashoffset:520;animation:draw 1.8s .3s cubic-bezier(.6,.1,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+header p{max-width:52ch;color:var(--mute);line-height:1.6;margin:14px 0 0}
+main{max-width:1200px;margin:0 auto;padding:20px 24px 70px;display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px;backdrop-filter:blur(8px);position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px)}
+@media(max-width:900px){.panel{position:static}}
+.panel h2{font-size:15px;margin:0 0 12px;font-weight:700}
+label{display:block;font-size:12.5px;color:var(--mute);margin:12px 0 5px}
+input,select{width:100%;font:inherit;font-size:14px;color:var(--text);background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,button:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+select option{color:#111}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+button{font:inherit;font-weight:600;font-size:13.5px;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;color:var(--text);background:rgba(255,255,255,.1);transition:transform .15s,background .2s}
+button:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+button.main{background:var(--gold);color:#2a2108}
+button.main:hover{background:#e6c47c}
+.stage{perspective:1400px}
+.sheet{position:relative;background:var(--paper);color:#23232b;border-radius:4px;padding:clamp(24px,5vw,64px);box-shadow:0 2px 0 #fff inset,0 30px 60px rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.3);transform-origin:50% 0;animation:land 1.1s .2s cubic-bezier(.2,.8,.2,1) both;background-image:repeating-linear-gradient(transparent 0 31px,rgba(27,37,89,.05) 31px 32px)}
+@keyframes land{from{opacity:0;transform:translateY(60px) rotateX(18deg) rotate(-1.2deg)}to{opacity:1;transform:none}}
+.sheet.flash{animation:none}
+.sheet h3{font-family:Newsreader,serif;font-size:clamp(22px,3.4vw,32px);text-align:center;margin:0 0 4px;font-weight:600;letter-spacing:.01em}
+.sub{text-align:center;color:#6b6a63;font-size:14px;margin-bottom:22px}
+.body{font-family:Newsreader,Georgia,serif;font-size:var(--fs,17.5px);line-height:1.75;min-height:260px;white-space:pre-wrap;outline:none;border-radius:6px;padding:2px 4px;margin:0 -4px}
+.body:hover{background:rgba(217,182,106,.1)}
+.body:empty::before{content:'Начните писать договор здесь: предмет, права и обязанности сторон, сумма, сроки…';color:#a7a698;font-style:italic}
+#ttl:hover{background:rgba(217,182,106,.1)}
+.fine{font-size:5px;line-height:1.35;color:#8f8e84;margin-top:16px;white-space:pre-wrap;outline:none;transition:font-size .9s cubic-bezier(.2,.8,.2,1),color .9s,line-height .9s}
+.fine.big{font-size:17px;line-height:1.65;color:var(--seal);font-family:Newsreader,Georgia,serif}
+.sheet.shake{animation:shake .5s}
+@keyframes shake{20%{transform:translateX(-7px) rotate(-.4deg)}40%{transform:translateX(7px) rotate(.4deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.fsz{display:flex;align-items:center;gap:10px}
+.fsz button{padding:8px 12px;flex:none}
+.fsz input{padding:0;accent-color:var(--gold);background:none;border:0}
+.hint{font-size:12px;color:#8a897f;margin-top:8px;font-family:Manrope,sans-serif}
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:34px}
+@media(max-width:620px){.sigs{grid-template-columns:1fr}}
+.sig .who{font-size:13px;color:#55544d;font-weight:600;min-height:20px}
+.pad{position:relative;height:130px;border-bottom:2px solid var(--ink);margin-top:4px;background:linear-gradient(transparent,rgba(27,37,89,.04));border-radius:6px 6px 0 0;transition:background .3s}
+.pad.active{background:rgba(217,182,106,.14)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.pad .ph{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#a7a698;font-size:13px;pointer-events:none;transition:opacity .3s}
+.pad.signed .ph{opacity:0}
+.x{position:absolute;left:4px;bottom:6px;font-size:20px;color:var(--ink);opacity:.5;pointer-events:none}
+.clr{font-size:12px;background:none;color:#7a7a70;padding:4px 0;margin-top:6px}
+.clr:hover{background:none;color:var(--seal);transform:none}
+.seal{position:absolute;right:clamp(14px,5vw,56px);top:calc(50% - 40px);width:128px;height:128px;pointer-events:none;opacity:0;transform:scale(2.6) rotate(-30deg)}
+.seal.on{animation:stamp .6s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes stamp{60%{opacity:.95}to{opacity:.9;transform:scale(1) rotate(-12deg)}}
+.sheet.bump{animation:bump .4s ease}
+@keyframes bump{30%{transform:translateY(5px) scale(.995)}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--gold);color:#2a2108;font-weight:700;padding:11px 18px;border-radius:12px;opacity:0;transition:.35s;z-index:20;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media print{
+  body{background:#fff}header,.panel,.toast,.clr,.hint{display:none!important}
+  main{display:block;padding:0}.sheet{box-shadow:none;animation:none;background-image:none}.body:hover{background:none}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important}.pen path{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Договор, который<br>приятно подписать</h1>
+  <svg class="pen" viewBox="0 0 420 24" preserveAspectRatio="none" aria-hidden="true"><path d="M2 16 C60 2, 90 24, 150 12 S 260 4, 300 14 S 380 20, 418 6"/></svg>
+  <p>Заполните данные сторон, выберите шаблон, поправьте текст прямо на листе и подпишите мышью или пальцем. Когда подписи поставлены обеими сторонами, на документе появится печать.</p>
+</header>
+ 
+<main>
+  <section class="panel" aria-label="Данные договора">
+    <h2>Данные договора</h2>
+    <label for="tpl">Шаблон</label>
+    <select id="tpl">
+      <option value="service">Оказание услуг</option>
+      <option value="rent">Аренда помещения</option>
+      <option value="sale">Купля-продажа</option>
+      <option value="nda">Соглашение о конфиденциальности</option>
+      <option value="blank">Пустой лист — пишу сам</option>
+      <option value="prank">Розыгрыш: мелкий шрифт 😈</option>
+    </select>
+    <div class="row">
+      <div><label for="city">Город</label><input id="city" value="Баку"></div>
+      <div><label for="date">Дата</label><input id="date" type="date"></div>
+    </div>
+    <label for="a">Сторона 1</label><input id="a" value="Иван Петров">
+    <label for="b">Сторона 2</label><input id="b" value="ООО «Рассвет»">
+    <label for="subj">Предмет договора</label><input id="subj" value="разработка сайта-визитки">
+    <div class="row">
+      <div><label for="sum">Сумма</label><input id="sum" value="1500"></div>
+      <div><label for="cur">Валюта</label><input id="cur" value="AZN"></div>
+    </div>
+    <label for="term">Срок (дней)</label><input id="term" type="number" min="1" value="30">
+    <label>Размер шрифта</label>
+    <div class="fsz">
+      <button id="fsm" aria-label="Уменьшить шрифт">A−</button>
+      <input id="fsr" type="range" min="9" max="26" step="0.5" value="17.5" aria-label="Размер шрифта">
+      <button id="fsp" aria-label="Увеличить шрифт">A+</button>
+    </div>
+    <div class="btns" style="margin-top:10px">
+      <button id="fsmall">Мелкий шрифт</button>
+      <button id="fsnorm">Обычный</button>
+    </div>
+    <div class="btns">
+      <button id="reveal" hidden style="background:var(--seal);color:#fff">Раскрыть шутку</button>
+      <button class="main" id="print">Сохранить в PDF</button>
+      <button id="regen">Собрать текст заново</button>
+      <button id="reset">Очистить подписи</button>
+    </div>
+  </section>
+ 
+  <div class="stage">
+    <article class="sheet" id="sheet">
+      <h3 id="ttl" contenteditable="true" spellcheck="false" style="outline:none" aria-label="Название договора">Договор</h3>
+      <div class="sub" id="sub"></div>
+      <div class="body" id="body" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Текст договора"></div>
+      <div class="hint">Текст можно править прямо здесь — просто кликните по нему.</div>
+      <div class="fine" id="fine" contenteditable="true" spellcheck="false" hidden aria-label="Текст мелким шрифтом"></div>
+      <div class="sigs">
+        <div class="sig"><div class="who" id="w1"></div>
+          <div class="pad" id="p1"><span class="x">×</span><span class="ph">Распишитесь здесь</span><canvas></canvas></div>
+          <button class="clr" data-i="0">Стереть подпись</button></div>
+        <div class="sig"><div class="who" id="w2"></div>
+          <div class="pad" id="p2"><span class="x">×</span><span class="ph">Распишитесь здесь</span><canvas></canvas></div>
+          <button class="clr" data-i="1">Стереть подпись</button></div>
+      </div>
+      <svg class="seal" id="seal" viewBox="0 0 120 120" aria-hidden="true">
+        <defs><path id="arc" d="M60 60 m-40 0 a40 40 0 1 1 80 0 a40 40 0 1 1 -80 0"/></defs>
+        <g fill="none" stroke="#b3302a" stroke-width="3"><circle cx="60" cy="60" r="56"/><circle cx="60" cy="60" r="30" stroke-width="2"/></g>
+        <text font-family="Manrope,sans-serif" font-weight="700" font-size="11.5" fill="#b3302a" letter-spacing="3.2"><textPath href="#arc" startOffset="0">ПОДПИСАНО · ДОГОВОР ·</textPath></text>
+        <path d="M45 60 l11 11 l20 -23" fill="none" stroke="#b3302a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </article>
+  </div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+ 
+<script>
+const $=id=>document.getElementById(id);
+const F=['tpl','city','date','a','b','subj','sum','cur','term'];
+let edited=false,fineEdited=false;
+function fineText(){const a=$('a').value||'Сторона 1',m=`${$('sum').value} ${$('cur').value}`;
+ return `*Мелким шрифтом. Сторона 2 обязуется: 1) приносить Стороне 1 пиццу по первому требованию в течение ${$('term').value} дней; 2) обращаться к Стороне 1 «Ваше Величество»; 3) мыть посуду за обе Стороны; 4) смеяться над всеми шутками Стороны 1, даже старыми; 5) выплатить ${m} шоколадом; 6) не жаловаться на мелкий шрифт. Нарушение любого пункта карается щекоткой. ${a} оставляет за собой право добавлять пункты без уведомления.`}
+ 
+$('date').value=new Date().toISOString().slice(0,10);
+ 
+const fmtDate=s=>{const d=new Date(s);return isNaN(d)?'':d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})};
+const titles={service:'Договор оказания услуг',rent:'Договор аренды помещения',sale:'Договор купли-продажи',nda:'Соглашение о конфиденциальности',blank:'Договор',prank:'Договор о вечной дружбе'};
+ 
+function build(){
+  const v={};F.forEach(k=>v[k]=$(k).value.trim());
+  const a=v.a||'Сторона 1', b=v.b||'Сторона 2', money=`${v.sum} ${v.cur}`;
+  const head=`${a} (далее — «Сторона 1») и ${b} (далее — «Сторона 2»), together именуемые «Стороны», заключили настоящий договор о нижеследующем.`.replace('together ','совместно ');
+  const t={
+service:`${head}
+ 
+1. Предмет договора
+Сторона 1 обязуется выполнить работу: ${v.subj}, а Сторона 2 — принять результат и оплатить его.
+ 
+2. Стоимость и оплата
+Стоимость работ составляет ${money}. Оплата производится в течение 3 рабочих дней после подписания акта выполненных работ.
+ 
+3. Сроки
+Работа выполняется в течение ${v.term} дней с даты подписания договора.
+ 
+4. Ответственность
+За нарушение сроков или условий оплаты виновная Сторона возмещает документально подтверждённые убытки.
+ 
+5. Заключительные положения
+Договор вступает в силу с момента подписания. Изменения действительны, если оформлены письменно и подписаны обеими Сторонами.`,
+rent:`${head}
+ 
+1. Предмет договора
+Сторона 1 передаёт Стороне 2 во временное пользование: ${v.subj}.
+ 
+2. Арендная плата
+Арендная плата составляет ${money} за весь срок аренды и вносится не позднее 5 числа каждого месяца.
+ 
+3. Срок аренды
+Срок аренды — ${v.term} дней с даты подписания. Продление возможно по письменному согласию Сторон.
+ 
+4. Обязанности Сторон
+Сторона 2 бережно использует помещение и возвращает его в исходном состоянии. Сторона 1 не вмешивается в законное использование.
+ 
+5. Заключительные положения
+Договор составлен в двух экземплярах, по одному для каждой Стороны.`,
+sale:`${head}
+ 
+1. Предмет договора
+Сторона 1 передаёт в собственность Стороны 2: ${v.subj}, а Сторона 2 принимает и оплачивает товар.
+ 
+2. Цена и расчёты
+Цена товара — ${money}. Расчёт производится в момент передачи.
+ 
+3. Передача товара
+Товар передаётся в течение ${v.term} дней с даты подписания. Риск случайной гибели переходит к покупателю с момента передачи.
+ 
+4. Качество
+Сторона 1 гарантирует, что товар свободен от прав третьих лиц.
+ 
+5. Заключительные положения
+Спорные вопросы решаются путём переговоров, а при недостижении согласия — в суде.`,
+nda:`${head}
+ 
+1. Предмет соглашения
+Стороны обмениваются конфиденциальной информацией в связи с: ${v.subj}.
+ 
+2. Обязательства
+Каждая Сторона обязуется не разглашать полученные сведения и использовать их только для целей сотрудничества.
+ 
+3. Штраф
+За нарушение конфиденциальности виновная Сторона выплачивает ${money}.
+ 
+4. Срок
+Обязательства действуют ${v.term} дней с даты подписания и сохраняются после окончания сотрудничества.
+ 
+5. Заключительные положения
+Соглашение вступает в силу с момента подписания обеими Сторонами.`,
+blank:``,
+prank:`${head}
+ 
+1. Предмет договора
+Стороны договорились, что ${a} и ${b} остаются лучшими друзьями навсегда. Договор очень простой и честный, читать его целиком совершенно не обязательно.
+ 
+2. Права Сторон
+Каждая Сторона вправе улыбаться, обниматься и угощать другую Сторону: ${v.subj}.
+ 
+3. Заключительные положения
+Подписывая ниже, Сторона 2 подтверждает, что всё прочитала и со всем согласна.`};
+  return t[v.tpl];
+}
+function render(full){
+  if(full)$('ttl').textContent=titles[$('tpl').value];
+  $('sub').textContent=`г. ${$('city').value} · ${fmtDate($('date').value)}`;
+  $('w1').textContent=$('a').value||'Сторона 1';
+  $('w2').textContent=$('b').value||'Сторона 2';
+  if(full||!edited){$('body').textContent=build();edited=false}
+  const pr=$('tpl').value==='prank';$('fine').hidden=!pr;$('reveal').hidden=!pr;
+  if(full){fineEdited=false;$('fine').classList.remove('big');$('reveal').textContent='Раскрыть шутку'}
+  if(pr&&(full||!fineEdited))$('fine').textContent=fineText();
+  save();
+}
+F.forEach(k=>$(k).addEventListener('input',()=>render(false)));
+$('tpl').addEventListener('change',()=>{render(true);if($('tpl').value==='blank'){$('body').focus();toast('Пишите текст прямо на листе')}});
+$('body').addEventListener('input',()=>{edited=true;save()});
+$('regen').onclick=()=>{render(true);toast('Текст собран заново')};
+ 
+/* Подпись */
+const pads=[$('p1'),$('p2')].map(pad=>{
+  const c=pad.querySelector('canvas'),x=c.getContext('2d');
+  const o={pad,c,x,has:false,last:null,w:2.4};
+  function fit(){const r=pad.getBoundingClientRect(),d=devicePixelRatio||1;
+    const img=o.has?x.getImageData(0,0,c.width,c.height):null;
+    c.width=r.width*d;c.height=r.height*d;x.setTransform(d,0,0,d,0,0);
+    x.lineCap='round';x.lineJoin='round';x.strokeStyle='#1b2559';
+    if(img)x.putImageData(img,0,0)}
+  o.fit=fit;fit();new ResizeObserver(fit).observe(pad);
+  const pt=e=>{const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,t:performance.now()}};
+  c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);o.last=pt(e);o.mid=o.last;o.w=2.4;pad.classList.add('active');
+    x.beginPath();x.fillStyle='#1b2559';x.arc(o.last.x,o.last.y,1.3,0,7);x.fill()});
+  c.addEventListener('pointermove',e=>{
+    if(!o.last)return;const p=pt(e);
+    const dist=Math.hypot(p.x-o.last.x,p.y-o.last.y),dt=Math.max(p.t-o.last.t,1),sp=dist/dt;
+    const target=Math.max(1.1,Math.min(3.6,3.8-sp*1.6));o.w+=(target-o.w)*.25;
+    const m={x:(o.last.x+p.x)/2,y:(o.last.y+p.y)/2};
+    x.lineWidth=o.w;x.beginPath();x.moveTo(o.mid.x,o.mid.y);x.quadraticCurveTo(o.last.x,o.last.y,m.x,m.y);x.stroke();
+    o.mid=m;o.last=p;
+    if(!o.has){o.has=true;pad.classList.add('signed')}});
+  const end=()=>{if(!o.last)return;o.last=null;pad.classList.remove('active');o.has=true;pad.classList.add('signed');check()};
+  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
+  return o});
+ 
+let sealed=false;
+function check(){
+  const both=pads.every(p=>p.has);
+  if(both&&!sealed){sealed=true;const s=$('seal');s.classList.remove('on');void s.offsetWidth;s.classList.add('on');
+    const sh=$('sheet');sh.classList.add('flash');sh.classList.remove('bump');void sh.offsetWidth;sh.classList.add('bump');
+    toast('Договор подписан обеими сторонами')}
+}
+function clearPad(i){const p=pads[i];p.x.save();p.x.setTransform(1,0,0,1,0,0);p.x.clearRect(0,0,p.c.width,p.c.height);p.x.restore();
+  p.has=false;p.pad.classList.remove('signed');sealed=false;$('seal').classList.remove('on')}
+document.querySelectorAll('.clr').forEach(b=>b.onclick=()=>clearPad(+b.dataset.i));
+$('reset').onclick=()=>{clearPad(0);clearPad(1);toast('Подписи очищены')};
+$('print').onclick=()=>{ if(!pads.every(p=>p.has)) toast('Можно сохранить и без подписей, но лучше подписать'); setTimeout(()=>window.print(),pads.every(p=>p.has)?0:900)};
+ 
+let fs=17.5;
+$('fine').addEventListener('input',()=>{fineEdited=true});
+$('reveal').onclick=()=>{const f=$('fine'),big=f.classList.toggle('big');$('reveal').textContent=big?'Спрятать обратно':'Раскрыть шутку';
+ if(big){const s=$('sheet');s.classList.add('flash');s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake');toast('Вас разыграли! 😄')}};
+function setFs(v){fs=Math.max(9,Math.min(26,+v||17.5));$('body').style.setProperty('--fs',fs+'px');$('fsr').value=fs;save()}
+$('fsm').onclick=()=>setFs(fs-1);
+$('fsp').onclick=()=>setFs(fs+1);
+$('fsr').oninput=e=>setFs(e.target.value);
+$('fsmall').onclick=()=>{setFs(10);toast('Мелкий шрифт включён')};
+$('fsnorm').onclick=()=>{setFs(17.5);toast('Обычный размер')};
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200)}
+ 
+/* Сохранение полей между визитами */
+function save(){try{const d={};F.forEach(k=>d[k]=$(k).value);d.edited=edited;d.fs=fs;if(edited)d.body=$('body').textContent;localStorage.setItem('contract',JSON.stringify(d))}catch(e){}}
+try{const d=JSON.parse(localStorage.getItem('contract')||'null');if(d){F.forEach(k=>{if(d[k]!=null)$(k).value=d[k]});if(d.fs)setFs(d.fs);render(true);if(d.edited&&d.body){$('body').textContent=d.body;edited=true}}else render(true)}catch(e){render(true)}
+</script>
+</body>
+</html>
+ 
